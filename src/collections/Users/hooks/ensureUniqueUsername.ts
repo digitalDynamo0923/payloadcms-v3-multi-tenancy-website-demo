@@ -30,7 +30,7 @@ export const ensureUniqueUsername: FieldHook = async ({ value, req, originalDoc,
   })
 
   if (findDuplicateUsers.docs.length > 0 && req.user) {
-    const tenantIDs = getTenantAccessIDs(req.user)
+    const tenantIDs = await getTenantAccessIDs(req.user)
     // if the user is an admin or has access to more than 1 tenant
     // provide a more specific error message
     if (req.user.roles?.includes('super-admin') || tenantIDs.length > 1) {
@@ -42,7 +42,7 @@ export const ensureUniqueUsername: FieldHook = async ({ value, req, originalDoc,
       throw new ValidationError({
         errors: [
           {
-            field: 'username',
+            path: 'username',
             message: `The "${attemptedTenantChange.name}" tenant already has a user with the username "${value}". Usernames must be unique per tenant.`,
           },
         ],
@@ -52,7 +52,7 @@ export const ensureUniqueUsername: FieldHook = async ({ value, req, originalDoc,
     throw new ValidationError({
       errors: [
         {
-          field: 'username',
+          path: 'username',
           message: `A user with the username ${value} already exists. Usernames must be unique per tenant.`,
         },
       ],

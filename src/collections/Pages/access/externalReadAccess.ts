@@ -3,12 +3,12 @@ import { parseCookies } from 'payload'
 import { isSuperAdmin } from '../../../access/isSuperAdmin'
 import { getTenantAccessIDs } from '../../../utilities/getTenantAccessIDs'
 
-export const externalReadAccess: Access = (args) => {
+export const externalReadAccess: Access = async (args) => {
   const req = args.req
   const cookies = parseCookies(req.headers)
   const superAdmin = isSuperAdmin(args)
   const selectedTenant = cookies.get('payload-tenant')
-  const tenantAccessIDs = getTenantAccessIDs(req.user)
+  const tenantAccessIDs = await getTenantAccessIDs(req.user)
 
   const publicPageConstraint: Where = {
     'tenant.public': {

@@ -30,7 +30,7 @@ export const ensureUniqueSlug: FieldHook = async ({ value, req, originalDoc, dat
   })
 
   if (findDuplicatePages.docs.length > 0 && req.user) {
-    const tenantIDs = getTenantAccessIDs(req.user)
+    const tenantIDs = await getTenantAccessIDs(req.user)
     // if the user is an admin or has access to more than 1 tenant
     // provide a more specific error message
     if (req.user.roles?.includes('super-admin') || tenantIDs.length > 1) {

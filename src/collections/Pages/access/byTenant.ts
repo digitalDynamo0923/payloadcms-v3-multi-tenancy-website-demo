@@ -3,13 +3,13 @@ import { parseCookies } from 'payload'
 import { isSuperAdmin } from '../../../access/isSuperAdmin'
 import { getTenantAccessIDs } from '../../../utilities/getTenantAccessIDs'
 
-export const byTenant: Access = (args) => {
+export const byTenant: Access = async (args) => {
   const req = args.req
   const cookies = parseCookies(req.headers)
   const superAdmin = isSuperAdmin(args)
   const selectedTenant = cookies.get('payload-tenant')
 
-  const tenantAccessIDs = getTenantAccessIDs(req.user)
+  const tenantAccessIDs = await getTenantAccessIDs(req.user)
 
   // First check for manually selected tenant from cookies
   if (selectedTenant) {
