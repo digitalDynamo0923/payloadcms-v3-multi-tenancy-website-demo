@@ -1,14 +1,16 @@
 import type { RequiredDataFromCollectionSlug } from 'payload'
-import type { Media } from '@/payload-types'
+import type { Media, Tenant } from '@/payload-types'
 
 type HomeArgs = {
   heroImage: Media
   metaImage: Media
+  tenant: Tenant
 }
 
 export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> = ({
   heroImage,
   metaImage,
+  tenant,
 }) => {
   return {
     slug: 'home',
@@ -671,5 +673,6 @@ export const home: (args: HomeArgs) => RequiredDataFromCollectionSlug<'pages'> =
       title: 'Payload Website Template',
     },
     title: 'Home',
+    tenant,
   }
 }

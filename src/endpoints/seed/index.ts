@@ -108,7 +108,7 @@ export const seed = async ({
     payload.create({
       collection: 'users',
       data: {
-        name: 'Demo Author',
+        username: 'Demo Author',
         email: 'demo-author@example.com',
         password: 'password',
       },
@@ -297,16 +297,24 @@ export const seed = async ({
 
   payload.logger.info(`— Seeding pages...`)
 
+  const rootTenant = await payload.create({
+    collection: 'tenants',
+    data: {
+      name: 'Root tenant',
+      slug: 'root-tenant',
+    },
+  })
+
   const [_, contactPage] = await Promise.all([
     payload.create({
       collection: 'pages',
       depth: 0,
-      data: home({heroImage: imageHomeDoc, metaImage: image2Doc}),
+      data: home({ heroImage: imageHomeDoc, metaImage: image2Doc, tenant: rootTenant }),
     }),
     payload.create({
       collection: 'pages',
       depth: 0,
-      data: contactPageData({ contactForm: contactForm }),
+      data: contactPageData({ contactForm: contactForm, tenant: rootTenant }),
     }),
   ])
 

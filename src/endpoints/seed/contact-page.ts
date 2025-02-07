@@ -1,12 +1,14 @@
-import type { Form } from '@/payload-types'
+import type { Form, Tenant } from '@/payload-types'
 import { RequiredDataFromCollectionSlug } from 'payload'
 
 type ContactArgs = {
   contactForm: Form
+  tenant: Tenant
 }
 
 export const contact: (args: ContactArgs) => RequiredDataFromCollectionSlug<'pages'> = ({
   contactForm,
+  tenant,
 }) => {
   return {
     slug: 'contact',
@@ -52,5 +54,6 @@ export const contact: (args: ContactArgs) => RequiredDataFromCollectionSlug<'pag
       },
     ],
     title: 'Contact',
+    tenant,
   }
 }
