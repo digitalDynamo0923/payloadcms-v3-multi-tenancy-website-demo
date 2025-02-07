@@ -1,7 +1,7 @@
 import type { CollectionSlug, PayloadRequest } from 'payload'
 import { getPayload } from 'payload'
 
-import { draftMode } from 'next/headers'
+import { cookies as getCookies, draftMode } from 'next/headers'
 import { redirect } from 'next/navigation'
 
 import configPromise from '@payload-config'
@@ -59,5 +59,17 @@ export async function GET(
 
   draft.enable()
 
-  redirect(path)
+  const cookies = await getCookies()
+  const tenantId = cookies.get('payload-tenant')?.value
+
+  if (tenantId) {
+    const tenant = await payload.findByID({
+      collection: 'tenants',
+      id: tenantId,
+    })
+
+    if (tenant) redirect(`/${tenant.slug}${path}`)
+  }
+
+  return new Response('Tenant is missing', { status: 404 })
 }

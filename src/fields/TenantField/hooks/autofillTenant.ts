@@ -7,7 +7,6 @@ export const autofillTenant: FieldHook = async ({ req, value }) => {
   // return that tenant ID as the value
   if (!value) {
     const tenantIDs = await getTenantAccessIDs(req.user)
-    console.log(tenantIDs)
     if (tenantIDs.length === 1) return tenantIDs[0]
   }
 

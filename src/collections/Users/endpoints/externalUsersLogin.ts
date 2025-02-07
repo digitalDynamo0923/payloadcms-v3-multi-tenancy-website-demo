@@ -1,5 +1,5 @@
 import { headersWithCors } from '@payloadcms/next/utilities'
-import { Endpoint, APIError, generatePayloadCookie, Collection } from 'payload'
+import { APIError, Collection, Endpoint, generatePayloadCookie } from 'payload'
 
 // A custom endpoint that can be reached by POST request
 // at: /api/users/external-users/login
@@ -31,8 +31,7 @@ export const externalUsersLogin: Endpoint = {
       })
     ).docs[0]
 
-    if (!fullTenant)
-      throw new APIError('Username and Password are required for login.', 400, null, true)
+    if (!fullTenant) throw new APIError('Tenant is missing', 400, null, true)
 
     const foundUser = await req.payload.find({
       collection: 'users',

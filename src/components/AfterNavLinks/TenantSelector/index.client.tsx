@@ -49,9 +49,7 @@ export const TenantSelector = ({ initialCookie }: { initialCookie?: string }) =>
     }
   }, [])
 
-  if (isSuperAdmin) return null
-
-  if (tenantIDs.length > 1) {
+  if (isSuperAdmin || tenantIDs.length > 1) {
     return (
       <div className="tenant-selector">
         <SelectInput

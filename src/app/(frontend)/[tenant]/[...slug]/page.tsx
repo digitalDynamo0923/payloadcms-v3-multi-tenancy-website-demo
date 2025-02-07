@@ -12,7 +12,6 @@ import { RenderHero } from '@/heros/RenderHero'
 import { generateMeta } from '@/utilities/generateMeta'
 import PageClient from './page.client'
 import { LivePreviewListener } from '@/components/LivePreviewListener'
-import { getPayloadHMR } from '@payloadcms/next/utilities'
 import { redirect } from 'next/navigation'
 
 export async function generateStaticParams() {
@@ -48,10 +47,10 @@ type Args = {
 
 export default async function Page({ params: paramsPromise }: Args) {
   const headers = await getHeaders()
-  const payload = await getPayloadHMR({ config: configPromise })
+  const payload = await getPayload({ config: configPromise })
   const { user } = await payload.auth({ headers })
   const { isEnabled: draft } = await draftMode()
-  const { slug = ['home'], tenant } = await paramsPromise
+  const { tenant, slug = ['home'] } = await paramsPromise
   const url = '/' + slug.join('/')
 
   let page: RequiredDataFromCollectionSlug<'pages'> | null
@@ -143,10 +142,10 @@ export default async function Page({ params: paramsPromise }: Args) {
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
   const headers = await getHeaders()
-  const payload = await getPayloadHMR({ config: configPromise })
+  const payload = await getPayload({ config: configPromise })
   const { user } = await payload.auth({ headers })
 
-  const { slug = ['home'], tenant } = await paramsPromise
+  const { tenant, slug = ['home'] } = await paramsPromise
   const tenantsQuery = await payload.find({
     collection: 'tenants',
     user,

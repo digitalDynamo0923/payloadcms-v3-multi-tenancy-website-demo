@@ -1,5 +1,6 @@
 import { Tenant } from '@/payload-types'
-import { PayloadRequest, CollectionSlug, parseCookies } from 'payload'
+import { CollectionSlug, parseCookies, PayloadRequest } from 'payload'
+import { cookies as getCookies } from 'next/headers'
 
 const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {
   posts: '/posts',
@@ -22,8 +23,8 @@ export const generatePreviewPath = async ({ collection, slug, req }: Props) => {
 
   const { payload } = req
 
-  const cookies = parseCookies(req.headers)
-  const selectedTenant = cookies.get('payload-tenant')
+  const cookies = await getCookies()
+  const selectedTenant = cookies.get('payload-tenant')?.value
 
   let tenant: Tenant | null = null
   if (selectedTenant) {
