@@ -1,7 +1,8 @@
+import { Tenant } from '@/payload-types'
 import type { RequiredDataFromCollectionSlug } from 'payload'
 
 // Used for pre-seeded content so that the homepage is not empty
-export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
+export const homeStatic = (tenant: Tenant): RequiredDataFromCollectionSlug<'pages'> => ({
   slug: 'home',
   _status: 'published',
   hero: {
@@ -85,4 +86,5 @@ export const homeStatic: RequiredDataFromCollectionSlug<'pages'> = {
   },
   title: 'Home',
   layout: [],
-}
+  tenant: tenant.id,
+})

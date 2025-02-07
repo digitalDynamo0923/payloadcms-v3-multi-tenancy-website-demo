@@ -117,7 +117,7 @@ export default async function Page({ params: paramsPromise }: Args) {
 
   // Remove this code once your website is seeded
   if (!page && slug.join('/') === 'home') {
-    page = homeStatic
+    page = homeStatic(tenantsQuery.docs[0]!)
   }
 
   if (!page) {
