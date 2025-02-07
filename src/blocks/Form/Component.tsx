@@ -32,6 +32,7 @@ export const FormBlock: React.FC<
   } = props
 
   const formMethods = useForm({
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     defaultValues: formFromProps.fields as any,
   })
   const {

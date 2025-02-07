@@ -95,16 +95,7 @@ export const seed = async ({
     ),
   ])
 
-  const [
-    demoAuthor,
-    image1Doc,
-    image2Doc,
-    image3Doc,
-    imageHomeDoc,
-    technologyCategory,
-    newsCategory,
-    financeCategory,
-  ] = await Promise.all([
+  const [demoAuthor, image1Doc, image2Doc, image3Doc, imageHomeDoc] = await Promise.all([
     payload.create({
       collection: 'users',
       data: {
@@ -212,20 +203,20 @@ export const seed = async ({
     }),
   ])
 
-  let demoAuthorID: number | string = demoAuthor.id
+  // let demoAuthorID: number | string = demoAuthor.id
 
-  let image1ID: number | string = image1Doc.id
-  let image2ID: number | string = image2Doc.id
-  let image3ID: number | string = image3Doc.id
-  let imageHomeID: number | string = imageHomeDoc.id
+  // let image1ID: number | string = image1Doc.id
+  // let image2ID: number | string = image2Doc.id
+  // let image3ID: number | string = image3Doc.id
+  // let imageHomeID: number | string = imageHomeDoc.id
 
-  if (payload.db.defaultIDType === 'text') {
-    image1ID = `"${image1Doc.id}"`
-    image2ID = `"${image2Doc.id}"`
-    image3ID = `"${image3Doc.id}"`
-    imageHomeID = `"${imageHomeDoc.id}"`
-    demoAuthorID = `"${demoAuthorID}"`
-  }
+  // if (payload.db.defaultIDType === 'text') {
+  //   image1ID = `"${image1Doc.id}"`
+  //   image2ID = `"${image2Doc.id}"`
+  //   image3ID = `"${image3Doc.id}"`
+  //   imageHomeID = `"${imageHomeDoc.id}"`
+  //   demoAuthorID = `"${demoAuthorID}"`
+  // }
 
   payload.logger.info(`— Seeding posts...`)
 
@@ -289,11 +280,11 @@ export const seed = async ({
     data: contactFormData,
   })
 
-  let contactFormID: number | string = contactForm.id
+  // let contactFormID: number | string = contactForm.id
 
-  if (payload.db.defaultIDType === 'text') {
-    contactFormID = `"${contactFormID}"`
-  }
+  // if (payload.db.defaultIDType === 'text') {
+  //   contactFormID = `"${contactFormID}"`
+  // }
 
   payload.logger.info(`— Seeding pages...`)
 

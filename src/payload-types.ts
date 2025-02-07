@@ -328,7 +328,7 @@ export interface User {
         id?: string | null;
       }[]
     | null;
-  username?: string | null;
+  username: string;
   updatedAt: string;
   createdAt: string;
   email: string;

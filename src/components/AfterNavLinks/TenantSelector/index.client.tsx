@@ -11,7 +11,7 @@ import { Option } from '@payloadcms/ui/elements/ReactSelect'
 export const TenantSelector = ({ initialCookie }: { initialCookie?: string }) => {
   const { user } = useAuth<User>()
   const [options, setOptions] = React.useState<OptionObject[]>([])
-  const [value, setValue] = React.useState<string | undefined>(initialCookie)
+  const [value] = React.useState<string | undefined>(initialCookie)
 
   const isSuperAdmin = user?.roles?.includes('super-admin')
   const tenantIDs =
@@ -23,7 +23,7 @@ export const TenantSelector = ({ initialCookie }: { initialCookie?: string }) =>
     }) || []
 
   function setCookie(name: string, value?: string) {
-    var expires = '; expires=Fri, 31 Dec 9999 23:59:59 GMT'
+    const expires = '; expires=Fri, 31 Dec 9999 23:59:59 GMT'
     document.cookie = name + '=' + (value || '') + expires + '; path=/'
   }
 

@@ -70,6 +70,7 @@ export const Users: CollectionConfig = {
       name: 'username',
       type: 'text',
       index: true,
+      required: true,
       hooks: {
         beforeValidate: [ensureUniqueUsername],
       },

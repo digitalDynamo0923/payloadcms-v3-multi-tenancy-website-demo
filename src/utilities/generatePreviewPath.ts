@@ -1,5 +1,5 @@
 import { Tenant } from '@/payload-types'
-import { CollectionSlug, parseCookies, PayloadRequest } from 'payload'
+import { CollectionSlug, PayloadRequest } from 'payload'
 import { cookies as getCookies } from 'next/headers'
 
 const collectionPrefixMap: Partial<Record<CollectionSlug, string>> = {

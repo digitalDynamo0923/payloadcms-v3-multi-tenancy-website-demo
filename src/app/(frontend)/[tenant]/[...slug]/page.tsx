@@ -141,21 +141,7 @@ export default async function Page({ params: paramsPromise }: Args) {
 }
 
 export async function generateMetadata({ params: paramsPromise }: Args): Promise<Metadata> {
-  const headers = await getHeaders()
-  const payload = await getPayload({ config: configPromise })
-  const { user } = await payload.auth({ headers })
-
   const { tenant, slug = ['home'] } = await paramsPromise
-  const tenantsQuery = await payload.find({
-    collection: 'tenants',
-    user,
-    overrideAccess: false,
-    where: {
-      slug: {
-        equals: tenant,
-      },
-    },
-  })
 
   const slugConstraint: Where = slug
     ? {

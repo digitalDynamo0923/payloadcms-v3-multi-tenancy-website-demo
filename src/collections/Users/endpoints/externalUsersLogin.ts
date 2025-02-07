@@ -13,7 +13,9 @@ export const externalUsersLogin: Endpoint = {
       if (typeof req.json === 'function') {
         data = await req.json()
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error(error)
+    }
     const { username, password, tenantSlug } = data
 
     if (!username || !password) {
@@ -106,6 +108,7 @@ export const externalUsersLogin: Endpoint = {
           true,
         )
       } catch (e) {
+        console.error(e)
         throw new APIError(
           'Unable to login with the provided username and password.',
           400,
