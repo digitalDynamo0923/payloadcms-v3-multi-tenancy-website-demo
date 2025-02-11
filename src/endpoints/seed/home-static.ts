@@ -86,5 +86,5 @@ export const homeStatic = (tenant: Tenant): RequiredDataFromCollectionSlug<'page
   },
   title: 'Home',
   layout: [],
-  tenant: tenant.id,
+  tenant: tenant,
 })

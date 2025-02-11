@@ -5,6 +5,7 @@ export const post3: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
   heroImage,
   blockImage,
   author,
+  tenant,
 }) => {
   return {
     slug: 'dollar-and-sense-the-financial-forecast',
@@ -264,5 +265,6 @@ export const post3: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
     },
     relatedPosts: [], // this is populated by the seed script
     title: 'Dollar and Sense: The Financial Forecast',
+    tenant,
   }
 }

@@ -1,7 +1,7 @@
 import type { Where, Access } from 'payload'
 import { parseCookies } from 'payload'
-import { isSuperAdmin } from '../../../access/isSuperAdmin'
-import { getTenantAccessIDs } from '../../../utilities/getTenantAccessIDs'
+import { isSuperAdmin } from './isSuperAdmin'
+import { getTenantAccessIDs } from '../utilities/getTenantAccessIDs'
 
 export const externalReadAccess: Access = async (args) => {
   const req = args.req

@@ -13,6 +13,11 @@ import { beforeSyncWithSearch } from '@/search/beforeSync'
 
 import { Page, Post } from '@/payload-types'
 import { getServerSideURL } from '@/utilities/getURL'
+import { tenantField } from '@/fields/TenantField'
+import { byTenant } from '@/access/byTenant'
+import { isPayloadAdminPanel } from '@/utilities/isPayloadAdminPanel'
+import { externalReadAccess } from '@/access/externalReadAccess'
+import { setTenantValue } from '@/hooks/setTenantValue'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
   return doc?.title ? `${doc.title} | Payload Website Template` : 'Payload Website Template'
@@ -30,20 +35,33 @@ export const plugins: Plugin[] = [
     overrides: {
       // @ts-expect-error - This is a valid override, mapped fields don't resolve to the same type
       fields: ({ defaultFields }) => {
-        return defaultFields.map((field) => {
-          if ('name' in field && field.name === 'from') {
-            return {
-              ...field,
-              admin: {
-                description: 'You will need to rebuild the website when changing this field.',
-              },
+        return [
+          ...defaultFields.map((field) => {
+            if ('name' in field && field.name === 'from') {
+              return {
+                ...field,
+                admin: {
+                  description: 'You will need to rebuild the website when changing this field.',
+                },
+              }
             }
-          }
-          return field
-        })
+            return field
+          }),
+          tenantField,
+        ]
       },
       hooks: {
         afterChange: [revalidateRedirects],
+        beforeOperation: [setTenantValue],
+      },
+      access: {
+        delete: (args) => byTenant({ ...args, hasDraft: false }),
+        read: async (args) => {
+          if (isPayloadAdminPanel(args.req)) return byTenant({ ...args, hasDraft: false })
+
+          return externalReadAccess(args)
+        },
+        update: (args) => byTenant({ ...args, hasDraft: false }),
       },
     },
   }),
@@ -61,23 +79,38 @@ export const plugins: Plugin[] = [
     },
     formOverrides: {
       fields: ({ defaultFields }) => {
-        return defaultFields.map((field) => {
-          if ('name' in field && field.name === 'confirmationMessage') {
-            return {
-              ...field,
-              editor: lexicalEditor({
-                features: ({ rootFeatures }) => {
-                  return [
-                    ...rootFeatures,
-                    FixedToolbarFeature(),
-                    HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
-                  ]
-                },
-              }),
+        return [
+          ...defaultFields.map((field) => {
+            if ('name' in field && field.name === 'confirmationMessage') {
+              return {
+                ...field,
+                editor: lexicalEditor({
+                  features: ({ rootFeatures }) => {
+                    return [
+                      ...rootFeatures,
+                      FixedToolbarFeature(),
+                      HeadingFeature({ enabledHeadingSizes: ['h1', 'h2', 'h3', 'h4'] }),
+                    ]
+                  },
+                }),
+              }
             }
-          }
-          return field
-        })
+            return field
+          }),
+          tenantField,
+        ]
+      },
+      access: {
+        delete: (args) => byTenant({ ...args, hasDraft: false }),
+        read: async (args) => {
+          if (isPayloadAdminPanel(args.req)) return byTenant({ ...args, hasDraft: false })
+
+          return externalReadAccess(args)
+        },
+        update: (args) => byTenant({ ...args, hasDraft: false }),
+      },
+      hooks: {
+        beforeOperation: [setTenantValue],
       },
     },
   }),

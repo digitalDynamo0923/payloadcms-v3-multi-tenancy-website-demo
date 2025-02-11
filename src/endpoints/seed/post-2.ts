@@ -5,6 +5,7 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
   heroImage,
   blockImage,
   author,
+  tenant,
 }) => {
   return {
     slug: 'global-gaze',
@@ -228,5 +229,6 @@ export const post2: (args: PostArgs) => RequiredDataFromCollectionSlug<'posts'> 
     },
     relatedPosts: [], // this is populated by the seed script
     title: 'Global Gaze: Beyond the Headlines',
+    tenant,
   }
 }

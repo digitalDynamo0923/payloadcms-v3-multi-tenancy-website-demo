@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation'
 import './index.scss'
 
 import { getClientSideURL } from '@/utilities/getURL'
+import { Tenant } from '@/payload-types'
 
 const baseClass = 'admin-bar'
 
@@ -33,8 +34,9 @@ const Title: React.FC = () => <span>Dashboard</span>
 
 export const AdminBar: React.FC<{
   adminBarProps?: PayloadAdminBarProps
+  tenant: Tenant
 }> = (props) => {
-  const { adminBarProps } = props || {}
+  const { adminBarProps, tenant } = props || {}
   const segments = useSelectedLayoutSegments()
   const [show, setShow] = useState(false)
   const collection = (
@@ -72,7 +74,7 @@ export const AdminBar: React.FC<{
           onAuthChange={onAuthChange}
           onPreviewExit={() => {
             fetch('/next/exit-preview').then(() => {
-              router.push('/')
+              router.push(`/${tenant.slug}/`)
               router.refresh()
             })
           }}

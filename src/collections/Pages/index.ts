@@ -20,19 +20,20 @@ import {
   OverviewField,
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
-import { byTenant } from './access/byTenant'
-import { externalReadAccess } from './access/externalReadAccess'
+import { byTenant } from '../../access/byTenant'
+import { externalReadAccess } from '../../access/externalReadAccess'
+import { setTenantValue } from '@/hooks/setTenantValue'
 
 export const Pages: CollectionConfig<'pages'> = {
   slug: 'pages',
   access: {
-    delete: byTenant,
+    delete: (args) => byTenant({ ...args, hasDraft: true }),
     read: async (args) => {
-      if (isPayloadAdminPanel(args.req)) return byTenant(args)
+      if (isPayloadAdminPanel(args.req)) return byTenant({ ...args, hasDraft: true })
 
       return externalReadAccess(args)
     },
-    update: byTenant,
+    update: (args) => byTenant({ ...args, hasDraft: true }),
   },
   // This config controls what's populated by default when a page is referenced
   // https://payloadcms.com/docs/queries/select#defaultpopulate-collection-config-property
@@ -132,6 +133,7 @@ export const Pages: CollectionConfig<'pages'> = {
     afterChange: [revalidatePage],
     beforeChange: [populatePublishedAt],
     afterDelete: [revalidateDelete],
+    beforeOperation: [setTenantValue],
   },
   versions: {
     drafts: {

@@ -1,4 +1,3 @@
-import { getTenantAccessIDs } from '@/utilities/getTenantAccessIDs'
 import type { CollectionBeforeChangeHook } from 'payload'
 
 export const populatePublishedAt: CollectionBeforeChangeHook = async ({ data, operation, req }) => {
@@ -11,14 +10,6 @@ export const populatePublishedAt: CollectionBeforeChangeHook = async ({ data, op
         ...result,
         publishedAt: now,
       }
-    }
-  }
-
-  if (!result.tenant) {
-    const tenantIDs = await getTenantAccessIDs(req.user)
-    result = {
-      ...result,
-      tenant: tenantIDs[0],
     }
   }
 

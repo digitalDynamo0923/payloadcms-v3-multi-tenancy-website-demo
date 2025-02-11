@@ -22,8 +22,9 @@ export const tenantField: Field = {
   },
   admin: {
     position: 'sidebar',
-    components: {
-      Field: '@/fields/TenantField/components/Field',
-    },
+    readOnly: true,
+    // components: {
+    //   Field: '@/fields/TenantField/components/Field',
+    // },
   },
 }

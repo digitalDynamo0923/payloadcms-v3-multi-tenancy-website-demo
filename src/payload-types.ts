@@ -197,6 +197,7 @@ export interface Post {
     | null;
   slug?: string | null;
   slugLock?: boolean | null;
+  tenant: string | Tenant;
   updatedAt: string;
   createdAt: string;
   _status?: ('draft' | 'published') | null;
@@ -223,6 +224,7 @@ export interface Media {
     };
     [k: string]: unknown;
   } | null;
+  tenant: string | Tenant;
   updatedAt: string;
   createdAt: string;
   url?: string | null;
@@ -295,6 +297,24 @@ export interface Media {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "tenants".
+ */
+export interface Tenant {
+  id: string;
+  name: string;
+  /**
+   * Used for url paths, example: /tenant-slug/page-slug
+   */
+  slug: string;
+  /**
+   * If checked, logging in is not required.
+   */
+  public?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "categories".
  */
 export interface Category {
@@ -302,6 +322,7 @@ export interface Category {
   title: string;
   slug?: string | null;
   slugLock?: boolean | null;
+  tenant: string | Tenant;
   parent?: (string | null) | Category;
   breadcrumbs?:
     | {
@@ -339,24 +360,6 @@ export interface User {
   loginAttempts?: number | null;
   lockUntil?: string | null;
   password?: string | null;
-}
-/**
- * This interface was referenced by `Config`'s JSON-Schema
- * via the `definition` "tenants".
- */
-export interface Tenant {
-  id: string;
-  name: string;
-  /**
-   * Used for url paths, example: /tenant-slug/page-slug
-   */
-  slug: string;
-  /**
-   * If checked, logging in is not required.
-   */
-  public?: boolean | null;
-  updatedAt: string;
-  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -696,6 +699,7 @@ export interface Form {
         id?: string | null;
       }[]
     | null;
+  tenant: string | Tenant;
   updatedAt: string;
   createdAt: string;
 }
@@ -722,6 +726,7 @@ export interface Redirect {
         } | null);
     url?: string | null;
   };
+  tenant: string | Tenant;
   updatedAt: string;
   createdAt: string;
 }
@@ -1120,6 +1125,7 @@ export interface PostsSelect<T extends boolean = true> {
       };
   slug?: T;
   slugLock?: T;
+  tenant?: T;
   updatedAt?: T;
   createdAt?: T;
   _status?: T;
@@ -1131,6 +1137,7 @@ export interface PostsSelect<T extends boolean = true> {
 export interface MediaSelect<T extends boolean = true> {
   alt?: T;
   caption?: T;
+  tenant?: T;
   updatedAt?: T;
   createdAt?: T;
   url?: T;
@@ -1225,6 +1232,7 @@ export interface CategoriesSelect<T extends boolean = true> {
   title?: T;
   slug?: T;
   slugLock?: T;
+  tenant?: T;
   parent?: T;
   breadcrumbs?:
     | T
@@ -1285,6 +1293,7 @@ export interface RedirectsSelect<T extends boolean = true> {
         reference?: T;
         url?: T;
       };
+  tenant?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -1417,6 +1426,7 @@ export interface FormsSelect<T extends boolean = true> {
         message?: T;
         id?: T;
       };
+  tenant?: T;
   updatedAt?: T;
   createdAt?: T;
 }

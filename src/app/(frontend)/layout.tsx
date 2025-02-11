@@ -11,13 +11,25 @@ import { Header } from '@/Header/Component'
 import { Providers } from '@/providers'
 import { InitTheme } from '@/providers/Theme/InitTheme'
 import { mergeOpenGraph } from '@/utilities/mergeOpenGraph'
-import { draftMode } from 'next/headers'
+import { draftMode, cookies as getCookies } from 'next/headers'
 
 import './globals.css'
 import { getServerSideURL } from '@/utilities/getURL'
+import { getPayload } from 'payload'
+import configPromise from '@payload-config'
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const { isEnabled } = await draftMode()
+  const cookies = await getCookies()
+  const tenantId = cookies.get('payload-tenant')?.value
+
+  if (!tenantId) return null
+
+  const payload = await getPayload({ config: configPromise })
+  const tenant = await payload.findByID({
+    collection: 'tenants',
+    id: tenantId,
+  })
 
   return (
     <html className={cn(GeistSans.variable, GeistMono.variable)} lang="en" suppressHydrationWarning>
@@ -32,6 +44,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
             adminBarProps={{
               preview: isEnabled,
             }}
+            tenant={tenant}
           />
 
           <Header />

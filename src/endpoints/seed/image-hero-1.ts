@@ -1,5 +1,6 @@
-import type { Media } from '@/payload-types'
+import type { Media, Tenant } from '@/payload-types'
 
-export const imageHero1: Omit<Media, 'createdAt' | 'id' | 'updatedAt'> = {
+export const imageHero1 = (tenant: Tenant): Omit<Media, 'createdAt' | 'id' | 'updatedAt'> => ({
   alt: 'Straight metallic shapes with a blue gradient',
-}
+  tenant,
+})

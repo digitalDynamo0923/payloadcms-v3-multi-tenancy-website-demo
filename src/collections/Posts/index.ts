@@ -9,8 +9,6 @@ import {
   lexicalEditor,
 } from '@payloadcms/richtext-lexical'
 
-import { authenticated } from '../../access/authenticated'
-import { authenticatedOrPublished } from '../../access/authenticatedOrPublished'
 import { Banner } from '../../blocks/Banner/config'
 import { Code } from '../../blocks/Code/config'
 import { MediaBlock } from '../../blocks/MediaBlock/config'
@@ -26,14 +24,22 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 import { slugField } from '@/fields/slug'
+import { byTenant } from '@/access/byTenant'
+import { isPayloadAdminPanel } from '@/utilities/isPayloadAdminPanel'
+import { externalReadAccess } from '@/access/externalReadAccess'
+import { tenantField } from '@/fields/TenantField'
+import { setTenantValue } from '@/hooks/setTenantValue'
 
 export const Posts: CollectionConfig<'posts'> = {
   slug: 'posts',
   access: {
-    create: authenticated,
-    delete: authenticated,
-    read: authenticatedOrPublished,
-    update: authenticated,
+    delete: (args) => byTenant({ ...args, hasDraft: true }),
+    read: async (args) => {
+      if (isPayloadAdminPanel(args.req)) return byTenant({ ...args, hasDraft: true })
+
+      return externalReadAccess(args)
+    },
+    update: (args) => byTenant({ ...args, hasDraft: true }),
   },
   // This config controls what's populated by default when a post is referenced
   // https://payloadcms.com/docs/queries/select#defaultpopulate-collection-config-property
@@ -218,11 +224,13 @@ export const Posts: CollectionConfig<'posts'> = {
       ],
     },
     ...slugField(),
+    tenantField,
   ],
   hooks: {
     afterChange: [revalidatePost],
     afterRead: [populateAuthors],
     afterDelete: [revalidateDelete],
+    beforeOperation: [setTenantValue],
   },
   versions: {
     drafts: {

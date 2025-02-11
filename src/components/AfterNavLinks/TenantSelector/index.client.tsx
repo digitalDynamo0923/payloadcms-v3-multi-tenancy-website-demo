@@ -1,64 +1,65 @@
 'use client'
 
 import React from 'react'
-import { useAuth, SelectInput } from '@payloadcms/ui'
-import { OptionObject } from 'payload'
+import { useAuth, SelectInput, useConfig } from '@payloadcms/ui'
 import type { Tenant, User } from '../../../payload-types'
 
 import './index.scss'
 import { Option } from '@payloadcms/ui/elements/ReactSelect'
+import { useParams } from 'next/navigation'
 
-export const TenantSelector = ({ initialCookie }: { initialCookie?: string }) => {
+export const TenantSelector = ({
+  selectedTenant,
+  tenants,
+}: {
+  selectedTenant: string
+  tenants: Tenant[]
+}) => {
   const { user } = useAuth<User>()
-  const [options, setOptions] = React.useState<OptionObject[]>([])
-  const [value] = React.useState<string | undefined>(initialCookie)
+  const [value] = React.useState<string>(selectedTenant)
+  const {
+    config: {
+      routes: { admin: adminRoute },
+    },
+  } = useConfig()
+  const params = useParams()
 
   const isSuperAdmin = user?.roles?.includes('super-admin')
-  const tenantIDs =
-    user?.tenants?.map(({ tenant }) => {
-      if (tenant) {
-        if (typeof tenant === 'string') return tenant
-        return tenant.id
-      }
-    }) || []
 
   function setCookie(name: string, value?: string) {
     const expires = '; expires=Fri, 31 Dec 9999 23:59:59 GMT'
     document.cookie = name + '=' + (value || '') + expires + '; path=/'
   }
 
-  React.useEffect(() => {
-    const fetchTenants = async () => {
-      const res = await fetch(`/api/tenants?depth=0&limit=100&sort=name`, {
-        credentials: 'include',
-      }).then((res) => res.json())
-
-      setOptions(res.docs.map((doc: Tenant) => ({ label: doc.name, value: doc.id })))
-    }
-
-    void fetchTenants()
-  }, [])
-
   const handleChange = React.useCallback((option: Option | Option[]) => {
+    let path = ''
+    if (!params.segments) path = ''
+    if (typeof params.segments === 'string') path = params.segments
+    if (Array.isArray(params.segments)) path = params.segments.slice(0, 2).filter(Boolean).join('/')
+
     if (!option) {
       setCookie('payload-tenant', undefined)
-      window.location.reload()
+      window.location.replace(`${adminRoute}/${path}`)
     } else if ('value' in option) {
       setCookie('payload-tenant', option.value as string)
-      window.location.reload()
+      window.location.replace(`${adminRoute}/${path}`)
     }
   }, [])
 
-  if (isSuperAdmin || tenantIDs.length > 1) {
+  if (isSuperAdmin || tenants.length > 1) {
     return (
       <div className="tenant-selector">
         <SelectInput
           label="Select a tenant"
           name="setTenant"
           path="setTenant"
-          options={options}
+          options={tenants.map((tenant) => ({
+            label: tenant.name,
+            value: tenant.id,
+          }))}
           onChange={handleChange}
           value={value}
+          isClearable={false}
         />
       </div>
     )

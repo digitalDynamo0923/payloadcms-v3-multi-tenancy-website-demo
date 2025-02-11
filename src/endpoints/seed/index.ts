@@ -18,6 +18,7 @@ const collections: CollectionSlug[] = [
   'forms',
   'form-submissions',
   'search',
+  'tenants',
 ]
 const globals: GlobalSlug[] = ['header', 'footer']
 
@@ -66,17 +67,46 @@ export const seed = async ({
       .map((collection) => payload.db.deleteVersions({ collection, req, where: {} })),
   )
 
-  payload.logger.info(`— Seeding demo author and user...`)
+  const superAdmin = await payload.find({
+    collection: 'users',
+    where: {
+      roles: {
+        contains: 'super-admin',
+      },
+    },
+  })
+
+  payload.logger.info(`Super Admin => ${superAdmin.docs[0]?.email}`)
 
   await payload.delete({
     collection: 'users',
     depth: 0,
     where: {
       email: {
-        equals: 'demo-author@example.com',
+        not_equals: superAdmin.docs[0]?.email,
       },
     },
   })
+
+  payload.logger.info(`- Seeding Tenants ...`)
+
+  const tenant1 = await payload.create({
+    collection: 'tenants',
+    data: {
+      name: 'Tenant 1',
+      slug: 'tenant-1',
+    },
+  })
+
+  const tenant2 = await payload.create({
+    collection: 'tenants',
+    data: {
+      name: 'Tenant 2',
+      slug: 'tenant-2',
+    },
+  })
+
+  payload.logger.info('Tenants', tenant1.id, tenant2.id)
 
   payload.logger.info(`— Seeding media...`)
 
@@ -95,113 +125,212 @@ export const seed = async ({
     ),
   ])
 
-  const [demoAuthor, image1Doc, image2Doc, image3Doc, imageHomeDoc] = await Promise.all([
-    payload.create({
-      collection: 'users',
-      data: {
-        username: 'Demo Author',
-        email: 'demo-author@example.com',
-        password: 'password',
-      },
-    }),
-    payload.create({
-      collection: 'media',
-      data: image1,
-      file: image1Buffer,
-    }),
-    payload.create({
-      collection: 'media',
-      data: image2,
-      file: image2Buffer,
-    }),
-    payload.create({
-      collection: 'media',
-      data: image2,
-      file: image3Buffer,
-    }),
-    payload.create({
-      collection: 'media',
-      data: imageHero1,
-      file: hero1Buffer,
-    }),
+  payload.logger.info(`— Seeding demo author and user...`)
 
-    payload.create({
-      collection: 'categories',
-      data: {
-        title: 'Technology',
-        breadcrumbs: [
-          {
-            label: 'Technology',
-            url: '/technology',
-          },
-        ],
-      },
-    }),
+  const [tenant1Admin, tenant2Admin, , , , , image1Doc, image2Doc, image3Doc, imageHomeDoc] =
+    await Promise.all([
+      payload.create({
+        collection: 'users',
+        data: {
+          username: 'Tenant 1 Admin',
+          email: 'tenant1.admin@example.com',
+          password: 'password',
+          roles: ['user'],
+          tenants: [
+            {
+              tenant: tenant1,
+              roles: ['super-admin'],
+            },
+          ],
+        },
+      }),
+      payload.create({
+        collection: 'users',
+        data: {
+          username: 'Tenant 2 Admin',
+          email: 'tenant2.admin@example.com',
+          password: 'password',
+          roles: ['user'],
+          tenants: [
+            {
+              tenant: tenant2,
+              roles: ['super-admin'],
+            },
+          ],
+        },
+      }),
+      payload.create({
+        collection: 'users',
+        data: {
+          username: 'Tenant 1 User',
+          email: 'tenant1.user@example.com',
+          password: 'password',
+          roles: ['user'],
+          tenants: [
+            {
+              tenant: tenant1,
+              roles: ['viewer'],
+            },
+          ],
+        },
+      }),
+      payload.create({
+        collection: 'users',
+        data: {
+          username: 'Tenant 2 User',
+          email: 'tenant2.user@example.com',
+          password: 'password',
+          roles: ['user'],
+          tenants: [
+            {
+              tenant: tenant2,
+              roles: ['viewer'],
+            },
+          ],
+        },
+      }),
+      payload.create({
+        collection: 'users',
+        data: {
+          username: 'Double Admin',
+          email: 'double.admin@example.com',
+          password: 'password',
+          roles: ['user'],
+          tenants: [
+            {
+              tenant: tenant1,
+              roles: ['super-admin'],
+            },
+            {
+              tenant: tenant2,
+              roles: ['super-admin'],
+            },
+          ],
+        },
+      }),
+      payload.create({
+        collection: 'users',
+        data: {
+          username: 'Double User',
+          email: 'double.user@example.com',
+          password: 'password',
+          roles: ['user'],
+          tenants: [
+            {
+              tenant: tenant1,
+              roles: ['viewer'],
+            },
+            {
+              tenant: tenant2,
+              roles: ['viewer'],
+            },
+          ],
+        },
+      }),
+      payload.create({
+        collection: 'media',
+        data: image1(tenant1),
+        file: image1Buffer,
+      }),
+      payload.create({
+        collection: 'media',
+        data: image2(tenant1),
+        file: image2Buffer,
+      }),
+      payload.create({
+        collection: 'media',
+        data: image2(tenant2),
+        file: image3Buffer,
+      }),
+      payload.create({
+        collection: 'media',
+        data: imageHero1(tenant1),
+        file: hero1Buffer,
+      }),
 
-    payload.create({
-      collection: 'categories',
-      data: {
-        title: 'News',
-        breadcrumbs: [
-          {
-            label: 'News',
-            url: '/news',
-          },
-        ],
-      },
-    }),
+      payload.create({
+        collection: 'categories',
+        data: {
+          title: 'Technology',
+          breadcrumbs: [
+            {
+              label: 'Technology',
+              url: '/technology',
+            },
+          ],
+          tenant: tenant1,
+        },
+      }),
 
-    payload.create({
-      collection: 'categories',
-      data: {
-        title: 'Finance',
-        breadcrumbs: [
-          {
-            label: 'Finance',
-            url: '/finance',
-          },
-        ],
-      },
-    }),
-    payload.create({
-      collection: 'categories',
-      data: {
-        title: 'Design',
-        breadcrumbs: [
-          {
-            label: 'Design',
-            url: '/design',
-          },
-        ],
-      },
-    }),
+      payload.create({
+        collection: 'categories',
+        data: {
+          title: 'News',
+          breadcrumbs: [
+            {
+              label: 'News',
+              url: '/news',
+            },
+          ],
+          tenant: tenant1,
+        },
+      }),
 
-    payload.create({
-      collection: 'categories',
-      data: {
-        title: 'Software',
-        breadcrumbs: [
-          {
-            label: 'Software',
-            url: '/software',
-          },
-        ],
-      },
-    }),
+      payload.create({
+        collection: 'categories',
+        data: {
+          title: 'Finance',
+          breadcrumbs: [
+            {
+              label: 'Finance',
+              url: '/finance',
+            },
+          ],
+          tenant: tenant2,
+        },
+      }),
+      payload.create({
+        collection: 'categories',
+        data: {
+          title: 'Design',
+          breadcrumbs: [
+            {
+              label: 'Design',
+              url: '/design',
+            },
+          ],
+          tenant: tenant2,
+        },
+      }),
 
-    payload.create({
-      collection: 'categories',
-      data: {
-        title: 'Engineering',
-        breadcrumbs: [
-          {
-            label: 'Engineering',
-            url: '/engineering',
-          },
-        ],
-      },
-    }),
-  ])
+      payload.create({
+        collection: 'categories',
+        data: {
+          title: 'Software',
+          breadcrumbs: [
+            {
+              label: 'Software',
+              url: '/software',
+            },
+          ],
+          tenant: tenant2,
+        },
+      }),
+
+      payload.create({
+        collection: 'categories',
+        data: {
+          title: 'Engineering',
+          breadcrumbs: [
+            {
+              label: 'Engineering',
+              url: '/engineering',
+            },
+          ],
+          tenant: tenant1,
+        },
+      }),
+    ])
 
   // let demoAuthorID: number | string = demoAuthor.id
 
@@ -228,8 +357,15 @@ export const seed = async ({
     context: {
       disableRevalidate: true,
     },
-    data: post1({ heroImage: image1Doc, blockImage: image2Doc, author: demoAuthor }),
+    data: post1({
+      heroImage: image1Doc,
+      blockImage: image2Doc,
+      author: tenant1Admin,
+      tenant: tenant1,
+    }),
   })
+
+  console.log('Post 1: ', post1Doc.id)
 
   const post2Doc = await payload.create({
     collection: 'posts',
@@ -237,8 +373,15 @@ export const seed = async ({
     context: {
       disableRevalidate: true,
     },
-    data: post2({ heroImage: image2Doc, blockImage: image3Doc, author: demoAuthor }),
+    data: post2({
+      heroImage: image2Doc,
+      blockImage: image3Doc,
+      author: tenant1Admin,
+      tenant: tenant1,
+    }),
   })
+
+  console.log('Post 2: ', post2Doc.id)
 
   const post3Doc = await payload.create({
     collection: 'posts',
@@ -246,29 +389,29 @@ export const seed = async ({
     context: {
       disableRevalidate: true,
     },
-    data: post3({ heroImage: image3Doc, blockImage: image1Doc, author: demoAuthor }),
+    data: post3({
+      heroImage: image3Doc,
+      blockImage: image1Doc,
+      author: tenant2Admin,
+      tenant: tenant2,
+    }),
   })
+
+  console.log('Post 3: ', post3Doc.id)
 
   // update each post with related posts
   await payload.update({
     id: post1Doc.id,
     collection: 'posts',
     data: {
-      relatedPosts: [post2Doc.id, post3Doc.id],
+      relatedPosts: [post2Doc.id],
     },
   })
   await payload.update({
     id: post2Doc.id,
     collection: 'posts',
     data: {
-      relatedPosts: [post1Doc.id, post3Doc.id],
-    },
-  })
-  await payload.update({
-    id: post3Doc.id,
-    collection: 'posts',
-    data: {
-      relatedPosts: [post1Doc.id, post2Doc.id],
+      relatedPosts: [post1Doc.id],
     },
   })
 
@@ -277,7 +420,7 @@ export const seed = async ({
   const contactForm = await payload.create({
     collection: 'forms',
     depth: 0,
-    data: contactFormData,
+    data: contactFormData(tenant1),
   })
 
   // let contactFormID: number | string = contactForm.id
@@ -288,24 +431,16 @@ export const seed = async ({
 
   payload.logger.info(`— Seeding pages...`)
 
-  const rootTenant = await payload.create({
-    collection: 'tenants',
-    data: {
-      name: 'Root tenant',
-      slug: 'root-tenant',
-    },
-  })
-
-  const [_, contactPage] = await Promise.all([
+  const [, contactPage] = await Promise.all([
     payload.create({
       collection: 'pages',
       depth: 0,
-      data: home({ heroImage: imageHomeDoc, metaImage: image2Doc, tenant: rootTenant }),
+      data: home({ heroImage: imageHomeDoc, metaImage: image2Doc, tenant: tenant1 }),
     }),
     payload.create({
       collection: 'pages',
       depth: 0,
-      data: contactPageData({ contactForm: contactForm, tenant: rootTenant }),
+      data: contactPageData({ contactForm: contactForm, tenant: tenant2 }),
     }),
   ])
 
