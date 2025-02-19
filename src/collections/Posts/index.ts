@@ -26,7 +26,6 @@ import {
 import { slugField } from '@/fields/slug'
 import { byTenant } from '@/access/byTenant'
 import { isPayloadAdminPanel } from '@/utilities/isPayloadAdminPanel'
-import { externalReadAccess } from '@/access/externalReadAccess'
 import { tenantField } from '@/fields/TenantField'
 import { setTenantValue } from '@/hooks/setTenantValue'
 
@@ -37,7 +36,11 @@ export const Posts: CollectionConfig<'posts'> = {
     read: async (args) => {
       if (isPayloadAdminPanel(args.req)) return byTenant({ ...args, hasDraft: true })
 
-      return externalReadAccess(args)
+      return {
+        _status: {
+          equals: 'published',
+        },
+      }
     },
     update: (args) => byTenant({ ...args, hasDraft: true }),
   },

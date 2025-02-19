@@ -1,9 +1,14 @@
+'use client'
+
 import Link from 'next/link'
 import React from 'react'
 
 import { Button } from '@/components/ui/button'
+import { useTenant } from '@/providers/Tenant'
 
 export default function NotFound() {
+  const { tenant } = useTenant()
+
   return (
     <div className="container py-28">
       <div className="prose max-w-none">
@@ -11,7 +16,7 @@ export default function NotFound() {
         <p className="mb-4">This page could not be found.</p>
       </div>
       <Button asChild variant="default">
-        <Link href="/">Go home</Link>
+        <Link href={`/${tenant}`}>Go home</Link>
       </Button>
     </div>
   )

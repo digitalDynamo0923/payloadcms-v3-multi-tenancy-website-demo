@@ -18,18 +18,27 @@ import { getServerSideURL } from '@/utilities/getURL'
 import { getPayload } from 'payload'
 import configPromise from '@payload-config'
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
+const TopBar = async ({ tenantId }: { tenantId: string }) => {
   const { isEnabled } = await draftMode()
-  const cookies = await getCookies()
-  const tenantId = cookies.get('payload-tenant')?.value
-
-  if (!tenantId) return null
-
   const payload = await getPayload({ config: configPromise })
   const tenant = await payload.findByID({
     collection: 'tenants',
     id: tenantId,
   })
+
+  return (
+    <AdminBar
+      adminBarProps={{
+        preview: isEnabled,
+      }}
+      tenant={tenant}
+    />
+  )
+}
+
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const cookies = await getCookies()
+  const tenantId = cookies.get('payload-tenant')?.value
 
   return (
     <html className={cn(GeistSans.variable, GeistMono.variable)} lang="en" suppressHydrationWarning>
@@ -40,12 +49,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body>
         <Providers>
-          <AdminBar
-            adminBarProps={{
-              preview: isEnabled,
-            }}
-            tenant={tenant}
-          />
+          {tenantId && <TopBar tenantId={tenantId} />}
 
           <Header />
           {children}

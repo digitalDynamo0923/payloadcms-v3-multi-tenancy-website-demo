@@ -16,7 +16,6 @@ import { getServerSideURL } from '@/utilities/getURL'
 import { tenantField } from '@/fields/TenantField'
 import { byTenant } from '@/access/byTenant'
 import { isPayloadAdminPanel } from '@/utilities/isPayloadAdminPanel'
-import { externalReadAccess } from '@/access/externalReadAccess'
 import { setTenantValue } from '@/hooks/setTenantValue'
 
 const generateTitle: GenerateTitle<Post | Page> = ({ doc }) => {
@@ -59,7 +58,7 @@ export const plugins: Plugin[] = [
         read: async (args) => {
           if (isPayloadAdminPanel(args.req)) return byTenant({ ...args, hasDraft: false })
 
-          return externalReadAccess(args)
+          return true
         },
         update: (args) => byTenant({ ...args, hasDraft: false }),
       },
@@ -105,7 +104,7 @@ export const plugins: Plugin[] = [
         read: async (args) => {
           if (isPayloadAdminPanel(args.req)) return byTenant({ ...args, hasDraft: false })
 
-          return externalReadAccess(args)
+          return true
         },
         update: (args) => byTenant({ ...args, hasDraft: false }),
       },

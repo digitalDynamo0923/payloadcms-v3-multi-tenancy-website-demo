@@ -7,16 +7,18 @@ import type { Header as HeaderType } from '@/payload-types'
 import { CMSLink } from '@/components/Link'
 import Link from 'next/link'
 import { SearchIcon } from 'lucide-react'
+import { useTenant } from '@/providers/Tenant'
 
 export const HeaderNav: React.FC<{ data: HeaderType }> = ({ data }) => {
   const navItems = data?.navItems || []
+  const { tenant } = useTenant()
 
   return (
     <nav className="flex gap-3 items-center">
       {navItems.map(({ link }, i) => {
         return <CMSLink key={i} {...link} appearance="link" />
       })}
-      <Link href="/search">
+      <Link href={`/${tenant}/search`}>
         <span className="sr-only">Search</span>
         <SearchIcon className="w-5 text-primary" />
       </Link>

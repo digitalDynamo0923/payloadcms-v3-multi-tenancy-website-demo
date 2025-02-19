@@ -10,9 +10,18 @@ import { CollectionArchive } from '@/components/CollectionArchive'
 export const ArchiveBlock: React.FC<
   ArchiveBlockProps & {
     id?: string
+    tenantSlug: string
   }
 > = async (props) => {
-  const { id, categories, introContent, limit: limitFromProps, populateBy, selectedDocs } = props
+  const {
+    id,
+    categories,
+    introContent,
+    limit: limitFromProps,
+    populateBy,
+    selectedDocs,
+    tenantSlug,
+  } = props
 
   const limit = limitFromProps || 3
 
@@ -26,6 +35,8 @@ export const ArchiveBlock: React.FC<
       else return category
     })
 
+    console.log(flattenedCategories)
+
     const fetchedPosts = await payload.find({
       collection: 'posts',
       depth: 1,
@@ -33,12 +44,27 @@ export const ArchiveBlock: React.FC<
       ...(flattenedCategories && flattenedCategories.length > 0
         ? {
             where: {
-              categories: {
-                in: flattenedCategories,
-              },
+              and: [
+                {
+                  categories: {
+                    in: flattenedCategories,
+                  },
+                },
+                {
+                  'tenant.slug': {
+                    equals: tenantSlug,
+                  },
+                },
+              ],
             },
           }
-        : {}),
+        : {
+            where: {
+              'tenant.slug': {
+                equals: tenantSlug,
+              },
+            },
+          }),
     })
 
     posts = fetchedPosts.docs
@@ -51,6 +77,8 @@ export const ArchiveBlock: React.FC<
       posts = filteredSelectedPosts
     }
   }
+
+  console.log(posts)
 
   return (
     <div className="my-16" id={`block-${id}`}>

@@ -21,7 +21,6 @@ import {
   PreviewField,
 } from '@payloadcms/plugin-seo/fields'
 import { byTenant } from '../../access/byTenant'
-import { externalReadAccess } from '../../access/externalReadAccess'
 import { setTenantValue } from '@/hooks/setTenantValue'
 
 export const Pages: CollectionConfig<'pages'> = {
@@ -31,7 +30,11 @@ export const Pages: CollectionConfig<'pages'> = {
     read: async (args) => {
       if (isPayloadAdminPanel(args.req)) return byTenant({ ...args, hasDraft: true })
 
-      return externalReadAccess(args)
+      return {
+        _status: {
+          equals: 'published',
+        },
+      }
     },
     update: (args) => byTenant({ ...args, hasDraft: true }),
   },
