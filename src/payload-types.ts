@@ -774,6 +774,7 @@ export interface Search {
         title?: string | null;
       }[]
     | null;
+  tenant: string | Tenant;
   updatedAt: string;
   createdAt: string;
 }
@@ -1469,6 +1470,7 @@ export interface SearchSelect<T extends boolean = true> {
         id?: T;
         title?: T;
       };
+  tenant?: T;
   updatedAt?: T;
   createdAt?: T;
 }

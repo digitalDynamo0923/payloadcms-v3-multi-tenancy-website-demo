@@ -118,7 +118,14 @@ export const plugins: Plugin[] = [
     beforeSync: beforeSyncWithSearch,
     searchOverrides: {
       fields: ({ defaultFields }) => {
-        return [...defaultFields, ...searchFields]
+        return [...defaultFields, ...searchFields, tenantField]
+      },
+      access: {
+        read: async (args) => {
+          if (isPayloadAdminPanel(args.req)) return byTenant({ ...args, hasDraft: false })
+
+          return true
+        },
       },
     },
   }),

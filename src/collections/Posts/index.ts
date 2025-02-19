@@ -34,7 +34,12 @@ export const Posts: CollectionConfig<'posts'> = {
   access: {
     delete: (args) => byTenant({ ...args, hasDraft: true }),
     read: async (args) => {
-      if (isPayloadAdminPanel(args.req)) return byTenant({ ...args, hasDraft: true })
+      console.log(args.req.headers.get('referer'))
+      if (isPayloadAdminPanel(args.req)) {
+        const refererPath = new URL(args.req.headers.get('referer')!).pathname
+        if (refererPath.endsWith('/search')) return true
+        return byTenant({ ...args, hasDraft: true })
+      }
 
       return {
         _status: {
